@@ -1,0 +1,25 @@
+import type { Theme } from "./types";
+
+const SANS =
+  'var(--font-pretendard), "Pretendard Variable", Pretendard, system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif';
+const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, "D2Coding", monospace';
+
+/** 색을 제외한 공통 토큰. 각 테마는 색과 이름만 정한다. */
+export const baseTokens: Omit<Theme, "label" | "color"> = {
+  font: { sans: SANS, display: SANS, mono: MONO },
+  type: {
+    landscape: { display: 144, h1: 96, h2: 64, body: 40, caption: 28 },
+    portrait: { display: 120, h1: 84, h2: 60, body: 40, caption: 30 },
+  },
+  leading: { tight: 1.15, normal: 1.5 },
+  tracking: { tight: "-0.02em" },
+  space: {
+    pad: { landscape: 120, portrait: 96 },
+    gap: [8, 16, 24, 40, 64, 96],
+  },
+  radius: 24,
+  motion: {
+    duration: { fast: 0.18, base: 0.35, slow: 0.7 },
+    easing: { standard: [0.2, 0, 0, 1], emphasized: [0.05, 0.7, 0.1, 1] },
+  },
+};

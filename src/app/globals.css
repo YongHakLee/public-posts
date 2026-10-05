@@ -1,1 +1,92 @@
 @import "tailwindcss";
+
+/* portrait: = 슬라이드 캔버스가 4:5일 때 (뷰포트 방향이 아님). 내장 portrait 변형을 덮어쓴다. */
+@custom-variant portrait (&:where([data-canvas="portrait"], [data-canvas="portrait"] *));
+
+@theme inline {
+  --color-bg: var(--t-bg);
+  --color-surface: var(--t-surface);
+  --color-fg: var(--t-fg);
+  --color-muted: var(--t-muted);
+  --color-accent: var(--t-accent);
+  --color-accent-fg: var(--t-accent-fg);
+  --color-border: var(--t-border);
+
+  --font-sans: var(--t-font-sans);
+  --font-display: var(--t-font-display);
+  --font-mono: var(--t-font-mono);
+
+  --text-display: var(--t-display);
+  --text-display--line-height: var(--t-leading-tight);
+  --text-h1: var(--t-h1);
+  --text-h1--line-height: var(--t-leading-tight);
+  --text-h2: var(--t-h2);
+  --text-h2--line-height: var(--t-leading-tight);
+  --text-body: var(--t-body);
+  --text-body--line-height: var(--t-leading-normal);
+  --text-caption: var(--t-caption);
+  --text-caption--line-height: var(--t-leading-normal);
+
+  --leading-tight: var(--t-leading-tight);
+  --leading-normal: var(--t-leading-normal);
+  --tracking-tight: var(--t-tracking-tight);
+
+  --spacing-canvas: var(--t-pad);
+  --spacing-s1: var(--t-gap-1);
+  --spacing-s2: var(--t-gap-2);
+  --spacing-s3: var(--t-gap-3);
+  --spacing-s4: var(--t-gap-4);
+  --spacing-s5: var(--t-gap-5);
+  --spacing-s6: var(--t-gap-6);
+
+  --radius-theme: var(--t-radius);
+}
+
+@layer base {
+  [data-theme] {
+    font-family: var(--t-font-sans);
+  }
+
+  [data-canvas="landscape"] {
+    --t-display: var(--t-display-l);
+    --t-h1: var(--t-h1-l);
+    --t-h2: var(--t-h2-l);
+    --t-body: var(--t-body-l);
+    --t-caption: var(--t-caption-l);
+    --t-pad: var(--t-pad-l);
+  }
+
+  [data-canvas="portrait"] {
+    --t-display: var(--t-display-p);
+    --t-h1: var(--t-h1-p);
+    --t-h2: var(--t-h2-p);
+    --t-body: var(--t-body-p);
+    --t-caption: var(--t-caption-p);
+    --t-pad: var(--t-pad-p);
+  }
+
+  /* 슬라이드 기본값. base 레이어라서 작성자의 유틸리티 클래스가 항상 이긴다. */
+  [data-slide-index] {
+    padding: var(--t-pad);
+    background-color: var(--t-bg);
+    color: var(--t-fg);
+    font-size: var(--t-body);
+    line-height: var(--t-leading-normal);
+  }
+}
+
+@media print {
+  @page {
+    size: 1920px 1080px;
+    margin: 0;
+  }
+  html,
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}
+
+.print-page {
+  break-after: page;
+}
