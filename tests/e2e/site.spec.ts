@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { expect, test } from "@playwright/test";
 import { sitePath } from "./helpers";
 
@@ -25,4 +26,11 @@ test("없는 slug는 404 페이지", async ({ page }) => {
 test("테마 갤러리는 프로덕션 빌드에 없다", async ({ page }) => {
   const res = await page.goto(sitePath("/gallery/"));
   expect(res?.status()).toBe(404);
+});
+
+test("덱 PDF는 예측 가능한 URL로 제공된다", async ({ request }) => {
+  test.skip(!existsSync("out/decks/hello.pdf"), "out/decks/hello.pdf 없음 — `npm run pdf`를 먼저 실행해야 검증된다 (CI는 e2e 전에 pdf를 실행한다)");
+  const res = await request.get(sitePath("/decks/hello.pdf"));
+  expect(res.status()).toBe(200);
+  expect(res.headers()["content-type"]).toContain("application/pdf");
 });
