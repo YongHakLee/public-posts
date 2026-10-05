@@ -1,0 +1,72 @@
+name: Build and deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Pin npm to packageManager
+        run: npm install -g "$(node -p "require('./package.json').packageManager")"
+
+      - run: npm ci
+
+      - run: npx playwright install --with-deps chromium
+
+      - name: Manifest matches pinned versions
+        run: npm run doctor -- --manifest-only
+
+      - run: npm run check
+
+      - run: npm run build
+
+      - name: Export PDFs (fails on canvas overflow)
+        run: npm run pdf
+
+      - run: npm run e2e
+
+      - name: Disable Jekyll so _next/ is served
+        run: touch out/.nojekyll
+
+      - if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: out
+
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: test-results
+          if-no-files-found: ignore
+
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
