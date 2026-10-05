@@ -27,6 +27,7 @@ export function ReadView({ slides, canvas, reportSteps, onToggleMode }: ReadView
   const theme = useTheme();
   const [current, setCurrent] = useState(() => parseHash(window.location.hash, slides.length));
   const [helpOpen, setHelpOpen] = useState(false);
+  const scroller = useRef<HTMLDivElement>(null);
   const list = useRef<HTMLDivElement>(null);
   const cards = useRef<(HTMLDivElement | null)[]>([]);
   const initial = useRef(current);
@@ -53,17 +54,29 @@ export function ReadView({ slides, canvas, reportSteps, onToggleMode }: ReadView
 
   useEffect(() => {
     const ratios = new Map<number, number>();
+    const container = scroller.current;
+    const evaluate = () => {
+      if (!settled.current || !container) return;
+      // 스크롤할 수 있고 끝에 닿았을 때만 atEnd (스크롤할 게 없으면 항상 '끝'이라 마지막 카드로 고정되어 버린다).
+      const scrollable = container.scrollHeight > container.clientHeight + 1;
+      const atEnd = scrollable && container.scrollTop + container.clientHeight >= container.scrollHeight - 1;
+      const best = pickCurrent(ratios, undefined, atEnd);
+      if (best !== null) setCurrent(best);
+    };
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) ratios.set(Number((entry.target as HTMLElement).dataset.card), entry.intersectionRatio);
-        if (!settled.current) return;
-        const best = pickCurrent(ratios);
-        if (best !== null) setCurrent(best);
+        evaluate();
       },
       { threshold: [0, 0.25, 0.5, 0.75, 1] },
     );
     for (const card of cards.current) if (card) observer.observe(card);
-    return () => observer.disconnect();
+    // 바닥에 닿아도 교차 비율은 변하지 않을 수 있으므로 스크롤에서도 다시 판단한다.
+    container?.addEventListener("scroll", evaluate, { passive: true });
+    return () => {
+      observer.disconnect();
+      container?.removeEventListener("scroll", evaluate);
+    };
   }, [slides.length]);
 
   useHashSync(current, slides.length, (index) => {
@@ -106,7 +119,7 @@ export function ReadView({ slides, canvas, reportSteps, onToggleMode }: ReadView
   const size = CANVAS_SIZE[canvas];
 
   return (
-    <div className="fixed inset-0 snap-y snap-proximity overflow-y-auto">
+    <div ref={scroller} className="fixed inset-0 snap-y snap-proximity overflow-y-auto">
       <div
         ref={list}
         className={cn("mx-auto flex w-full flex-col gap-4 px-3 py-4", canvas === "portrait" ? "max-w-[560px]" : "max-w-[1200px]")}

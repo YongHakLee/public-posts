@@ -14,4 +14,18 @@ describe("pickCurrent", () => {
   it("비어 있으면 null", () => {
     expect(pickCurrent(new Map())).toBeNull();
   });
+  describe("스크롤 끝(atEnd)", () => {
+    it("끝에 닿으면 기준을 넘는 마지막 카드가 이긴다", () => {
+      expect(pickCurrent(new Map([[2, 1], [3, 1]]), 0.3, true)).toBe(3);
+    });
+    it("끝이 아니면 동률은 여전히 앞 카드", () => {
+      expect(pickCurrent(new Map([[2, 1], [3, 1]]), 0.3, false)).toBe(2);
+    });
+    it("끝에서도 기준 미만인 카드는 고르지 않는다", () => {
+      expect(pickCurrent(new Map([[2, 1], [3, 0.1]]), 0.3, true)).toBe(2);
+    });
+    it("끝에서 기준을 넘는 카드가 없으면 null", () => {
+      expect(pickCurrent(new Map([[2, 0.1], [3, 0.2]]), 0.3, true)).toBeNull();
+    });
+  });
 });

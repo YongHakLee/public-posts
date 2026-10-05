@@ -9,7 +9,19 @@ export type KeyInput = {
 
 export type Command = "next" | "prev" | "first" | "last" | "fullscreen" | "mode" | "help" | "close";
 
-/** 글자 단축키는 key가 아닌 code로 판단한다 — 한글 입력 상태에서는 key가 'ㄹ' 등이 되기 때문. */
+const isAsciiLetter = (key: string) => /^[a-z]$/i.test(key);
+
+/**
+ * 글자 단축키 판단: key가 ASCII 글자면 key로 (AZERTY·Dvorak 등 비QWERTY 배열에서도 글자 그대로 동작).
+ * key가 ASCII 글자가 아닐 때만(한글 'ㄹ', IME 'Process' 등) 물리 키 code로 되돌아간다.
+ * 단축키가 아닌 ASCII 글자는 code로 되돌아가지 않는다.
+ */
+function letterOf(e: KeyInput): string | null {
+  if (isAsciiLetter(e.key)) return e.key.toLowerCase();
+  const match = /^Key([A-Z])$/.exec(e.code);
+  return match ? match[1].toLowerCase() : null;
+}
+
 export function keyToCommand(e: KeyInput): Command | null {
   if (e.ctrlKey || e.metaKey || e.altKey) return null;
   switch (e.key) {
@@ -32,14 +44,13 @@ export function keyToCommand(e: KeyInput): Command | null {
     case "Escape":
       return "close";
   }
-  switch (e.code) {
-    case "KeyF":
+  switch (letterOf(e)) {
+    case "f":
       return "fullscreen";
-    case "KeyM":
+    case "m":
       return "mode";
-    case "Slash":
-      return e.shiftKey ? "help" : null;
   }
+  if (e.code === "Slash" && e.shiftKey) return "help";
   return null;
 }
 
@@ -48,7 +59,7 @@ export type StageCommand = "toggle" | "restart";
 export function stageKeyToCommand(e: KeyInput): StageCommand | null {
   if (e.ctrlKey || e.metaKey || e.altKey) return null;
   if (e.key === " " || e.code === "Space") return "toggle";
-  if (e.code === "KeyR") return "restart";
+  if (letterOf(e) === "r") return "restart";
   return null;
 }
 

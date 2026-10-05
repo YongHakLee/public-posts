@@ -81,3 +81,11 @@ test("? 키로 도움말을 열고 아무 키로 닫는다", async ({ page }) =>
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page).toHaveURL(/#1$/);
 });
+
+test("좁고 긴 창(읽기 모드)에서도 End로 마지막 슬라이드에 도달한다", async ({ page }) => {
+  await page.setViewportSize({ width: 500, height: 1400 });
+  await page.goto(DECK);
+  await expect(page.locator("[data-deck]")).toHaveAttribute("data-mode", "read");
+  await page.keyboard.press("End");
+  await expect(page).toHaveURL(/#4$/);
+});

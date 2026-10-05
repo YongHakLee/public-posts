@@ -35,6 +35,15 @@ describe("keyToCommand", () => {
     expect(keyToCommand(key("ㄹ", { code: "KeyF" }))).toBe("fullscreen");
     expect(keyToCommand(key("ㅡ", { code: "KeyM" }))).toBe("mode");
   });
+  it("ASCII 글자는 key를 우선한다 — AZERTY·Dvorak 같은 비QWERTY 배열", () => {
+    expect(keyToCommand(key("m", { code: "Semicolon" }))).toBe("mode");
+    expect(keyToCommand(key("f", { code: "KeyY" }))).toBe("fullscreen");
+    expect(keyToCommand(key("F", { code: "KeyF", shiftKey: true }))).toBe("fullscreen");
+  });
+  it("단축키가 아닌 ASCII 글자는 code로 되돌아가지 않는다", () => {
+    expect(keyToCommand(key("a", { code: "KeyF" }))).toBeNull();
+    expect(keyToCommand(key("a", { code: "KeyM" }))).toBeNull();
+  });
   it("수정 키와 함께면 무시 (브라우저 단축키 보호)", () => {
     expect(keyToCommand(key("ArrowRight", { metaKey: true }))).toBeNull();
     expect(keyToCommand(key("f", { code: "KeyF", ctrlKey: true }))).toBeNull();
@@ -50,6 +59,10 @@ describe("stageKeyToCommand", () => {
     expect(stageKeyToCommand(key("r", { code: "KeyR" }))).toBe("restart");
     expect(stageKeyToCommand(key("ㄱ", { code: "KeyR" }))).toBe("restart");
     expect(stageKeyToCommand(key("x", { code: "KeyX" }))).toBeNull();
+  });
+  it("비QWERTY 배열: key가 ASCII 글자면 key를 우선한다", () => {
+    expect(stageKeyToCommand(key("r", { code: "KeyK" }))).toBe("restart");
+    expect(stageKeyToCommand(key("a", { code: "KeyR" }))).toBeNull();
   });
 });
 
