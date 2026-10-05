@@ -51,12 +51,14 @@ type Theme = {
 ## 3. 글꼴
 
 ### 3.1 추가 글꼴 (2종)
-| 역할 | 후보 | 선정 기준 |
-|---|---|---|
-| 명조(세리프) 가족 | 마루부리, Noto Serif KR | OFL 라이선스, woff2, Regular·Bold 이상, 한글 전체 글리프, 전체 용량이 작은 쪽 |
-| 디스플레이 | Black Han Sans 등 굵은 제목용 한글 글꼴 | OFL, woff2, 단일 굵은 굵기 |
+| 역할 | 글꼴 | 파일 (용량) | 출처 |
+|---|---|---|---|
+| 명조(세리프) | Hahmlet (가변 100–900) | `src/fonts/HahmletVariable.ttf` (3.4MB) | google/fonts `ofl/hahmlet` |
+| 디스플레이 | Black Han Sans | `src/fonts/BlackHanSans-Regular.ttf` (0.95MB) | google/fonts `ofl/blackhansans` |
 
-구체 글꼴과 파일은 구현 계획 단계에서 용량·라이선스를 확인해 고정한다. 기본(Pretendard)과 코드용(시스템 모노 스택)은 그대로다.
+출처는 google/fonts 커밋 `9710da1eacb3`으로 고정하고, 각 폴더의 `OFL.txt`를 라이선스 파일로 함께 넣는다. 기본(Pretendard)과 코드용(시스템 모노 스택)은 그대로다.
+
+선정 경위(계획 단계 조사): 마루부리는 용량이 가장 작지만(woff2 2종 1.7MB) 배포 패키지에 라이선스 전문이 없어 제외, Noto Serif KR은 가변 TTF 23MB로 과대. 단일 파일 woff2 배포본이 없고 변환 도구도 저장소 환경에 없어 TTF를 그대로 쓴다(`next/font/local`이 TTF를 지원). `preload: false`라 해당 글꼴을 쓰는 테마의 텍스트가 있을 때만 내려받는다.
 
 ### 3.2 로딩
 - `src/fonts/index.ts`에 `next/font/local`로 등록하고 각자 CSS 변수(`--font-<이름>`)를 갖는다. 루트 레이아웃이 모든 글꼴 변수 클래스를 `<html>`에 붙인다.
@@ -140,6 +142,7 @@ type Theme = {
 
 ### 6.2 그 밖의 검증
 - 프로덕션 제외: 기존 E2E(`/gallery/` → 404)와 빌드 후 `out/gallery` 부재 확인.
+- 갤러리 동작: dev 서버 대상 Playwright 테스트(`npm run e2e:dev`, `tests/dev/`) — 필터, URL 복원·정리, 선택 3개 제한, 필터 변경 시 선택 유지.
 - 시각 확인: 개발 모드에서 13개 테마를 갤러리로 직접 훑어본다(색감·글꼴의 적절성은 사람이 판단).
 - 기존 덱·E2E·PDF는 테마 이름과 외형이 그대로라 변경 없이 통과해야 한다.
 
