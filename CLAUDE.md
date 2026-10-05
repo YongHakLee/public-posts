@@ -2,7 +2,7 @@
 
 # public-posts
 
-웹에서 동작하는 슬라이드 덱·모션 그래픽을 만들어 GitHub Pages(`https://<id>.github.io/public-posts/`)에 정적 배포한다. 웹이 원본이고, 덱 PDF는 배포 때 자동 생성되어 `/public-posts/decks/<slug>.pdf`로만 접근한다(어디에도 링크하지 않음).
+웹에서 동작하는 슬라이드 덱·모션 그래픽을 만들어 GitHub Pages(`https://yonghaklee.github.io/public-posts/`)에 정적 배포한다. 웹이 원본이고, 덱 PDF는 배포 때 자동 생성되어 `/public-posts/decks/<slug>.pdf`로만 접근한다(어디에도 링크하지 않음).
 
 설계: `docs/superpowers/specs/2026-10-05-web-presentation-platform-design.md`
 
