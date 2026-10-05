@@ -9,8 +9,16 @@ export type ColorToken = (typeof COLOR_TOKENS)[number];
 
 export type Bezier = [number, number, number, number];
 
+/** 갤러리 필터 순서이기도 하다 */
+export const THEME_TAGS = ["논문", "학술", "산뜻", "차분", "화려", "색채", "다크", "미니멀", "비즈니스", "따뜻함"] as const;
+export type ThemeTag = (typeof THEME_TAGS)[number];
+
 export type Theme = {
   label: string;
+  /** 한 줄 설명. 갤러리 카드·상세에 표시 */
+  description: string;
+  /** 1~3개, 중복 없음 */
+  tags: readonly ThemeTag[];
   color: Record<ColorToken, string>;
   font: { sans: string; display: string; mono: string };
   /** 논리 px (캔버스 좌표계) */
@@ -30,3 +38,6 @@ export type Theme = {
     easing: { standard: Bezier; emphasized: Bezier };
   };
 };
+
+/** 색·이름·설명·태그를 뺀 디자인 토큰 */
+export type ThemeTokens = Omit<Theme, "label" | "description" | "tags" | "color">;

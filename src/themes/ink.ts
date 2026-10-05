@@ -1,9 +1,9 @@
-import { baseTokens } from "./base";
-import type { Theme } from "./types";
+import { defineTheme } from "./define";
 
-export const ink: Theme = {
-  ...baseTokens,
+export const ink = defineTheme({
   label: "Ink",
+  description: "어두운 배경의 고대비. 프로젝터·어두운 장소용",
+  tags: ["다크", "차분", "미니멀"],
   color: {
     bg: "#0F1115",
     surface: "#1A1D24",
@@ -13,4 +13,4 @@ export const ink: Theme = {
     accentFg: "#0F1115",
     border: "#2A2E37",
   },
-};
+});

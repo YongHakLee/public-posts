@@ -1,8 +1,8 @@
 import { FONT_STACKS, MONO_STACK } from "./fonts";
-import type { Theme } from "./types";
+import type { ThemeTokens } from "./types";
 
-/** 색을 제외한 공통 토큰. 각 테마는 색과 이름만 정한다. */
-export const baseTokens: Omit<Theme, "label" | "color"> = {
+/** 모든 테마의 기본 토큰. 테마는 defineTheme()으로 다른 부분만 덮어쓴다. */
+export const baseTokens: ThemeTokens = {
   font: { sans: FONT_STACKS.sans, display: FONT_STACKS.sans, mono: MONO_STACK },
   type: {
     landscape: { display: 144, h1: 96, h2: 64, body: 40, caption: 28 },

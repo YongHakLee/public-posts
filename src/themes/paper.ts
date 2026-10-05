@@ -1,9 +1,9 @@
-import { baseTokens } from "./base";
-import type { Theme } from "./types";
+import { defineTheme } from "./define";
 
-export const paper: Theme = {
-  ...baseTokens,
+export const paper = defineTheme({
   label: "Paper",
+  description: "따뜻한 흰 배경에 검정 글자, 파랑 포인트 하나. 강의·문서형 기본값",
+  tags: ["학술", "차분", "미니멀"],
   color: {
     bg: "#FAFAF7",
     surface: "#FFFFFF",
@@ -13,4 +13,4 @@ export const paper: Theme = {
     accentFg: "#FFFFFF",
     border: "#E2E2DC",
   },
-};
+});
