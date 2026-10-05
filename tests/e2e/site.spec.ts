@@ -21,3 +21,8 @@ test("없는 slug는 404 페이지", async ({ page }) => {
   expect(res?.status()).toBe(404);
   await expect(page.getByText("페이지를 찾을 수 없습니다")).toBeVisible();
 });
+
+test("테마 갤러리는 프로덕션 빌드에 없다", async ({ page }) => {
+  const res = await page.goto(sitePath("/gallery/"));
+  expect(res?.status()).toBe(404);
+});
