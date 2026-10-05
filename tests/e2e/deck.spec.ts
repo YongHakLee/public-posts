@@ -49,6 +49,8 @@ test("범위 밖·잘못된 해시는 보정된다", async ({ page }) => {
   await expect(activeSlide(page)).toHaveAttribute("data-slide-index", "4");
   await expect(page).toHaveURL(/#4$/);
 
+  // 같은 문서 안의 해시 이동이 아니라 실제 문서 로드로 잘못된 해시를 파싱하게 한다.
+  await page.goto("about:blank");
   await openDeck(page, "#abc");
   await expect(activeSlide(page)).toHaveAttribute("data-slide-index", "1");
   await expect(page).toHaveURL(/#1$/);
