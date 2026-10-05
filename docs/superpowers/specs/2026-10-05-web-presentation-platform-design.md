@@ -38,9 +38,10 @@
 | 스타일 | Tailwind CSS v4 (`@theme`로 CSS 변수 매핑) | 4.3.x |
 | PDF·E2E | Playwright (Chromium) | 1.63.x |
 | 단위 테스트 | Vitest | 구현 계획에서 확정 |
-| 언어 | TypeScript | Next 16 호환 버전을 구현 계획에서 확인 후 고정 (7.x 호환 여부 검증) |
+| 언어 | TypeScript | 6.0.3 (7.x는 typescript-eslint 8의 peer 범위 `<6.1.0` 밖이라 보류) |
+| 린트 | ESLint + eslint-config-next | 9.39.5 / 16.3.8 (ESLint 10은 eslint-plugin-react 크래시) |
 | 런타임 | Node.js / npm | 24.18.0 / 11.16.0 |
-| 폰트 | Pretendard 등 저장소 내 셀프호스팅 | — |
+| 폰트 | Pretendard, `src/fonts/`에 셀프호스팅 (`next/font/local`) | 1.3.9 |
 
 검토 후 기각한 대안:
 - **Astro + React 아일랜드**: 덱·모션이 대부분 클라이언트 인터랙션이라 JS 최소화 장점이 약하고, 컴포넌트 모델이 둘이 된다.
@@ -68,7 +69,7 @@ public-posts/
 │  │  └─ gallery/page.dev.tsx # dev 전용 테마 갤러리
 │  ├─ engine/                 # Deck, Slide, Step, 내비게이션, 모드, MotionStage
 │  └─ themes/                 # Theme 타입, 테마 정의, ThemeProvider
-├─ public/fonts/
+├─ src/fonts/                   # woff2 + 라이선스 + fonts.json(버전 기록)
 ├─ scripts/
 │  ├─ serve-out.ts            # basePath를 흉내 내는 정적 서버 (node:http)
 │  ├─ export-pdf.ts           # 덱별 PDF 생성 + 오버플로 검사
@@ -107,6 +108,8 @@ type Work = {
 
 작업물 추가 = `content/<kind>/<slug>/index.tsx` 작성 + 레지스트리 항목 1개.
 
+공개(draft 아님) 작업물은 종류별 최소 1개가 있어야 한다. Next 정적 export가 빈 `generateStaticParams()`를 빌드 오류로 처리하기 때문이며, 레지스트리 검증 테스트가 이를 한국어 메시지로 알려준다.
+
 ### 3.4 dev 전용 페이지
 `pageExtensions`에 `dev.tsx`를 개발 모드에서만 포함한다. `*.dev.tsx` 페이지는 프로덕션 빌드에서 라우트로 인식되지 않으므로 배포물에 포함되지 않는다.
 
@@ -131,9 +134,9 @@ type Work = {
 | `<Step>` | 하나씩 등장 | 모두 표시 |
 | 전환·모션 | 재생 | 슬라이드가 화면에 들어올 때 가볍게 |
 
-- 자동 선택: 뷰포트가 세로(높이 > 너비)이면 읽기 모드, 아니면 발표 모드. 방향이 바뀌면 현재 슬라이드를 유지한 채 전환. 수동 지정: `M` 키 또는 `?mode=read|present` (수동 지정이 자동 선택보다 우선).
+- 자동 선택: 뷰포트가 세로(`(orientation: portrait)`, 높이 ≥ 너비)이면 읽기 모드, 아니면 발표 모드. 방향이 바뀌면 현재 슬라이드를 유지한 채 전환. 수동 지정: `M` 키 또는 `?mode=read|present` (수동 지정이 자동 선택보다 우선).
 - `F` 전체화면 토글, `?` 단축키 도움말 오버레이.
-- 화면 UI는 얇은 진행 바(발표)와 점 인디케이터(읽기)뿐. 버튼 없음.
+- 화면 UI는 얇은 진행 바(발표)와 점 인디케이터(읽기, 12장 초과 시 `n / N`)뿐. 버튼 없음.
 - 해시 `#n`(1부터)이 현재 슬라이드를 나타내며 새로고침·링크 공유 시 유지된다. 범위 밖 값은 가장 가까운 유효값으로 보정.
 
 ### 4.3 인쇄 모드 (`?print`)
@@ -145,7 +148,7 @@ type Work = {
 
 ### 4.4 애니메이션
 - `<Step order? effect?>`: 순차 등장. `effect`는 엔진 내장 `fade`(기본) `rise` `scale` 중 하나. 지속시간·이징은 테마 motion 토큰을 사용.
-- 슬라이드 전환: Motion `AnimatePresence`. 기본 `fade`, 덱 단위로 지정 가능.
+- 슬라이드 전환: `fade`(기본) `slide` `none` 중 덱 단위로 지정. Step 개수를 측정하려고 모든 슬라이드를 마운트해 두므로, `AnimatePresence` 대신 각 슬라이드의 opacity/x를 Motion으로 애니메이션한다.
 - `prefers-reduced-motion: reduce`이면 모든 효과를 짧은 페이드로 대체.
 
 ### 4.5 독립 모션 작품
@@ -153,8 +156,8 @@ type Work = {
 - 뷰포트에 보이면 자동 재생, 탭/`Space` 일시정지·재개, `R` 다시 재생.
 - 타임라인은 Motion `animate()` 시퀀스로 작성. PDF 생성 대상이 아니다.
 
-### 4.6 JS 없이
-정적 export된 HTML에는 슬라이드가 세로로 나열된 상태가 들어 있어 JS가 없어도 내용을 읽을 수 있다(스케일링·탐색·애니메이션은 없음).
+### 4.6 클라이언트 전용 렌더와 JS 없이
+모드·캔버스가 뷰포트와 URL에 따라 정해지므로 작업물(덱·모션)은 클라이언트에서만 렌더한다(`next/dynamic`, `ssr: false`). 서버 렌더 결과와 첫 화면이 달라 깜빡이는 문제를 피하기 위함이다. 정적 HTML에는 작업물별 `<title>`·OG 메타데이터와 `<noscript>` 안내(제목·설명·"JavaScript가 필요합니다")만 들어 있다.
 
 ## 5. 테마 (`src/themes`)
 
@@ -227,7 +230,7 @@ type Work = {
 | npm | `package.json` `packageManager` | 해당 버전 설치 |
 | PDF용 Chromium | `@playwright/test` 버전(lockfile)에 종속 | `npx playwright install --with-deps chromium` |
 | OS 의존성 | Playwright `--with-deps` | WSL2/Linux/macOS별 메모를 CLAUDE.md에 |
-| 폰트 | `public/fonts/` (Git 커밋) | 없음 |
+| 폰트 | `src/fonts/` + `src/fonts/fonts.json` (Git 커밋) | 없음 |
 | 환경 변수 | v1에는 없음 | 필요해지면 `.env.example` 추가 |
 
 ### 7.3 CLAUDE.md 구성
@@ -243,7 +246,7 @@ type Work = {
 |---|---|---|
 | 실행 중인 Node/npm 버전이 고정값과 일치 | ✓ | — (setup-node가 보장) |
 | Playwright Chromium 설치 여부 | ✓ | — |
-| `public/fonts/` 필수 파일 존재 | ✓ | ✓ |
+| `src/fonts/fonts.json`에 적힌 폰트·라이선스 파일 존재 | ✓ | ✓ |
 | CLAUDE.md 매니페스트 표의 버전 = `.nvmrc`·`package.json`·lockfile의 실제 값 | ✓ | ✓ |
 
 불일치 시 항목별로 기대값·실제값을 출력하고 비정상 종료한다.
@@ -266,9 +269,9 @@ type Work = {
 | 슬라이드 내용이 캔버스 초과 | `npm run pdf` 실패, 작업물·슬라이드·캔버스 보고, 배포 중단 |
 | PDF 생성 실패 | 배포 중단, 기존 버전 유지 |
 | 폰트 로드 실패 | 시스템 폰트 폴백 (레이아웃 유지) |
-| JS 비활성 | 사전 렌더된 슬라이드 세로 나열 |
+| JS 비활성 | `<noscript>`로 제목·설명·안내 표시 |
 | CLAUDE.md 매니페스트 불일치 | CI 실패 |
 
 ## 10. 구현 전 준비 사항
 - 현재 디렉터리는 Git 저장소가 아니며 `gh` CLI가 없다. GitHub 저장소(`public-posts`) 생성과 첫 push는 사용자가 직접 하거나 `gh` 설치 후 진행한다. 구현 계획에 단계로 포함한다.
-- TypeScript 버전은 Next 16 호환성을 확인한 뒤 고정한다.
+- TypeScript는 6.0.3으로 고정했다(스파이크로 확인: TS 7은 Next 16 빌드는 되지만 typescript-eslint와 충돌).
