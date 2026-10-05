@@ -15,7 +15,7 @@
 | `content/motion/<slug>/index.tsx` | 독립 모션 (`<MotionStage>`) |
 | `src/engine/` | 슬라이드 엔진. `*.ts` 순수 로직(단위 테스트), `*.tsx` 컴포넌트(E2E) |
 | `src/themes/` | 테마 토큰(`paper`, `ink`, `signal`) → CSS 변수 |
-| `src/fonts/` | 셀프호스팅 폰트 + `fonts.json`(버전·라이선스) |
+| `src/fonts/` | 셀프호스팅 폰트(Pretendard, Hahmlet 명조, Black Han Sans 디스플레이) + `fonts.json`(버전·출처·라이선스) + `registry.ts` |
 | `src/app/gallery/page.dev.tsx` | 테마 갤러리 (dev 전용, 빌드 제외) |
 | `scripts/` | `serve-out`(로컬 정적 서버), `export-pdf`, `doctor` |
 | `site.config.ts` | `BASE_PATH` 등 사이트 상수 (basePath는 여기서만) |
@@ -84,6 +84,8 @@
 | tsx | 4.23.15 | `package-lock.json#tsx` | `npm ci` |
 | Playwright (Chromium 빌드 결정) | 1.63.0 | `package-lock.json#@playwright/test` | `npx playwright install --with-deps chromium` |
 | Pretendard | 1.3.9 | `src/fonts/fonts.json#Pretendard` | Git에 포함 (OFL-1.1) |
+| Hahmlet | google-fonts@9710da1eacb3 | `src/fonts/fonts.json#Hahmlet` | Git에 포함 (OFL-1.1) |
+| Black Han Sans | google-fonts@9710da1eacb3 | `src/fonts/fonts.json#Black Han Sans` | Git에 포함 (OFL-1.1) |
 <!-- manifest:end -->
 
 마지막 검증: 2026-10-05 (WSL2 Ubuntu, `npm run doctor` 통과)

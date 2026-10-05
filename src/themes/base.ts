@@ -1,12 +1,9 @@
+import { FONT_STACKS, MONO_STACK } from "./fonts";
 import type { Theme } from "./types";
-
-const SANS =
-  'var(--font-pretendard), "Pretendard Variable", Pretendard, system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif';
-const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, "D2Coding", monospace';
 
 /** 색을 제외한 공통 토큰. 각 테마는 색과 이름만 정한다. */
 export const baseTokens: Omit<Theme, "label" | "color"> = {
-  font: { sans: SANS, display: SANS, mono: MONO },
+  font: { sans: FONT_STACKS.sans, display: FONT_STACKS.sans, mono: MONO_STACK },
   type: {
     landscape: { display: 144, h1: 96, h2: 64, body: 40, caption: 28 },
     portrait: { display: 120, h1: 84, h2: 60, body: 40, caption: 30 },

@@ -5,5 +5,21 @@
     "file": "PretendardVariable.woff2",
     "license": "OFL-1.1",
     "licenseFile": "LICENSE-Pretendard.txt"
+  },
+  {
+    "family": "Hahmlet",
+    "version": "google-fonts@9710da1eacb3",
+    "file": "HahmletVariable.ttf",
+    "license": "OFL-1.1",
+    "licenseFile": "LICENSE-Hahmlet.txt",
+    "source": "https://github.com/google/fonts/tree/9710da1eacb3be272583c3224dcb70f9da6eadbb/ofl/hahmlet"
+  },
+  {
+    "family": "Black Han Sans",
+    "version": "google-fonts@9710da1eacb3",
+    "file": "BlackHanSans-Regular.ttf",
+    "license": "OFL-1.1",
+    "licenseFile": "LICENSE-BlackHanSans.txt",
+    "source": "https://github.com/google/fonts/tree/9710da1eacb3be272583c3224dcb70f9da6eadbb/ofl/blackhansans"
   }
 ]
