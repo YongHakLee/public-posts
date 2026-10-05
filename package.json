@@ -16,6 +16,7 @@
     "check": "npm run typecheck && npm run lint && npm run test",
     "pdf": "tsx scripts/export-pdf.ts",
     "e2e": "playwright test",
+    "e2e:dev": "playwright test -c playwright.dev.config.ts",
     "doctor": "tsx scripts/doctor.ts"
   },
   "dependencies": {

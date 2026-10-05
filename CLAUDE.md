@@ -16,7 +16,7 @@
 | `src/engine/` | 슬라이드 엔진. `*.ts` 순수 로직(단위 테스트), `*.tsx` 컴포넌트(E2E) |
 | `src/themes/` | 테마 13개(태그로 분류, `defineTheme`) → CSS 변수 |
 | `src/fonts/` | 셀프호스팅 폰트(Pretendard, Hahmlet 명조, Black Han Sans 디스플레이) + `fonts.json`(버전·출처·라이선스) + `registry.ts` |
-| `src/app/gallery/page.dev.tsx` | 테마 갤러리 (dev 전용, 빌드 제외) |
+| `src/app/gallery/page.dev.tsx` | 테마 갤러리 (dev 전용, 빌드 제외) — 태그 필터·카드·최대 3개 비교, 상태는 URL(`?tag=&sel=`) |
 | `scripts/` | `serve-out`(로컬 정적 서버), `export-pdf`, `doctor` |
 | `site.config.ts` | `BASE_PATH` 등 사이트 상수 (basePath는 여기서만) |
 
@@ -30,6 +30,7 @@
 | `npm run pdf` | 빌드 결과에서 덱 PDF 생성 + 캔버스 오버플로 검사 |
 | `npm run check` | 타입체크 + 린트 + 단위 테스트 |
 | `npm run e2e` | `out/` 대상 E2E (먼저 `build`) |
+| `npm run e2e:dev` | dev 서버 대상 갤러리 E2E (`tests/dev`) |
 | `npm run doctor` | 환경이 아래 매니페스트와 일치하는지 검사 |
 
 ## 레시피
