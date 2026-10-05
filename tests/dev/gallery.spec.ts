@@ -50,3 +50,20 @@ test("카드의 태그를 누르면 그 태그로 거른다", async ({ page }) =
   await expect(cards(page)).toHaveCount(3);
   expect(await namesOf(page, "[data-theme-card]", "data-theme-card")).toEqual(["ink", "boardroom", "neon"]);
 });
+
+test("테마 범위에서 가짜 굵게(font-synthesis)를 끈다 — 굵기 하나뿐인 디스플레이 글꼴 보호", async ({ page }) => {
+  await page.goto(`${GALLERY}?sel=neon`);
+  const detail = page.locator('[data-theme-detail="neon"]');
+  await expect(detail).toHaveCount(1);
+  expect(await detail.evaluate((el) => getComputedStyle(el).getPropertyValue("font-synthesis-weight"))).toBe("none");
+});
+
+test("제목 요소는 font-display 클래스 없이도 테마의 제목 글꼴을 쓴다", async ({ page }) => {
+  await page.goto(`${GALLERY}?sel=neon,terracotta,paper`);
+  const headingFont = (name: string) =>
+    page.locator(`[data-theme-detail="${name}"] header h2`).evaluate((el) => getComputedStyle(el).fontFamily);
+  await expect(details(page)).toHaveCount(3);
+  expect(await headingFont("neon")).toContain("Black Han Sans");
+  expect(await headingFont("terracotta")).toContain("Hahmlet");
+  expect(await headingFont("paper")).toContain("Pretendard");
+});

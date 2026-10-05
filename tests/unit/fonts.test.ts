@@ -35,6 +35,19 @@ describe("글꼴 스택", () => {
     expect(registeredVariables).toContain(variable);
   });
 
+  it.each(Object.entries(FONT_STACKS))("%s 스택의 모든 var(--font-*)가 등록돼 있다 (하나라도 없으면 스택 전체가 무효)", (_, stack) => {
+    const used = [...stack.matchAll(/var\((--font-[a-z0-9-]+)\)/g)].map((m) => m[1]);
+    expect(used.length).toBeGreaterThan(0);
+    for (const variable of used) expect(registeredVariables).toContain(variable);
+  });
+
+  it("fontVariables가 선언한 글꼴을 모두 포함한다 (빠지면 <html>에 변수가 정의되지 않음)", () => {
+    const declared = [...indexSource.matchAll(/export const (\w+) = localFont\(/g)].map((m) => m[1]);
+    const listed = /fontVariables = \[([^\]]*)\]/.exec(indexSource)?.[1]?.split(",").map((name) => name.trim()) ?? [];
+    expect(declared.length).toBe(FONT_REGISTRY.length);
+    expect(listed.toSorted()).toEqual(declared.toSorted());
+  });
+
   it("familyForStack은 등록된 글꼴 이름을 돌려준다", () => {
     expect(familyForStack(FONT_STACKS.sans)).toBe("Pretendard");
     expect(familyForStack(FONT_STACKS.serif)).toBe("Hahmlet");

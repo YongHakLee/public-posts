@@ -45,6 +45,13 @@
 @layer base {
   [data-theme] {
     font-family: var(--t-font-sans);
+    /* 굵기가 하나뿐인 글꼴(디스플레이)을 브라우저가 가짜로 굵게 만들어 획이 뭉개지지 않게 한다 */
+    font-synthesis-weight: none;
+  }
+
+  /* 제목 요소는 테마의 제목 글꼴을 쓴다. 유틸리티 클래스(font-sans 등)가 항상 이긴다. */
+  [data-theme] :where(h1, h2, h3) {
+    font-family: var(--t-font-display);
   }
 
   [data-canvas="landscape"] {

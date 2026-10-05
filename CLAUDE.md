@@ -44,6 +44,7 @@
 ### 슬라이드 작성 규칙
 - 테마 유틸리티: `bg-bg text-fg bg-surface text-muted bg-accent text-accent-fg border-border`, `text-display|h1|h2|body|caption`, `p-canvas`, `gap-s1…s6`, `rounded-theme`, `font-display`.
 - `<Slide theme="ink">`로 슬라이드 한 장만 테마를 바꿀 수 있다.
+- 제목 요소(`h1`·`h2`·`h3`)는 자동으로 테마의 제목 글꼴을 쓴다. 다른 요소에 제목 글꼴을 쓰려면 `font-display`. 테마 안에서는 가짜 굵게(`font-synthesis`)가 꺼져 있어, 굵기가 하나뿐인 글꼴(Black Han Sans)은 `font-bold`를 줘도 그 굵기 그대로 보인다.
 - `<Step>`은 문서 순서대로 등장. 함께 등장시키려면 같은 `order`를 준다.
 - 캔버스 밖으로 일부러 걸치는 장식 요소는 `data-bleed`를 붙여 오버플로 검사에서 뺀다.
 - 뷰포트 반응형 변형(`sm:`·`md:`·`lg:`·`xl:`·`2xl:`)과 뷰포트 단위(`vw`·`vh`·`dvh`·`svh`·`lvh`, `h-screen` 등)는 쓰지 않는다. 캔버스 차이는 `portrait:`로만 표현한다. 이들은 실제 창 크기에 반응하는데 오버플로 검사는 정확히 1080×1350 / 1920×1080에서만 돌기 때문에, 390px 폰에서 보이는 다른 레이아웃을 검사가 승인할 수 있다. `tests/unit/content-rules.test.ts`가 `content/decks`·`content/motion` 소스를 스캔해 어기면 실패시킨다.
@@ -61,7 +62,7 @@
 ### 테마 추가
 1. `src/themes/<name>.ts`에서 `defineTheme({ label, description, tags, color, tokens? })`로 정의하고 `src/themes/index.ts`의 `themes`에 등록한다.
    - `tokens`에는 기본값(`src/themes/base.ts`)과 다른 부분만 적는다. 객체는 하위 키 단위로 병합되고 배열(gap, easing)은 통째로 바뀐다. 스타일 프리셋: `academicTokens`(논문 스케일), `vividTokens`(화려 스케일·모션) — `src/themes/presets.ts`.
-   - 글꼴은 `src/themes/fonts.ts`의 `FONT_STACKS.sans|serif|display`만 쓴다. 새 글꼴이 필요하면 `src/fonts/`에 파일·라이선스를 넣고 `fonts.json`, `src/fonts/registry.ts`, `src/fonts/index.ts`(`preload: false`), 위 매니페스트 표에 함께 추가한다.
+   - 글꼴은 `src/themes/fonts.ts`의 `FONT_STACKS.sans|serif|display`만 쓴다. 새 글꼴이 필요하면 `src/fonts/`에 파일·라이선스를 넣고 다음을 함께 바꾼다: `fonts.json`, `src/fonts/registry.ts`, `src/fonts/index.ts`(`localFont`에 `preload: false`, 그리고 `fontVariables` 배열에 추가), `src/themes/fonts.ts`의 `FONT_STACKS`(새 스택), 위 매니페스트 표. `tests/unit/fonts.test.ts`가 빠진 곳을 잡는다.
    - 태그는 `THEME_TAGS`(`src/themes/types.ts`) 중 1~3개. 모든 태그는 2개 이상의 테마가 써야 한다.
 2. `npm run test` — 대비 4.5:1, 타입 스케일 순서, 태그·글꼴 규칙을 검사한다. `npm run dev` 후 `/public-posts/gallery/`에서 확인한다.
 
