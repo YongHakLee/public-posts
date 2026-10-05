@@ -9,7 +9,8 @@ import { startServer } from "./lib/serve";
 
 const OUT = "out";
 const READY_TIMEOUT = 30_000;
-// portrait 검사를 먼저 해서 PDF를 만들기 전에 실패를 모은다.
+// 덱마다 portrait → landscape 순으로 검사한다. landscape PDF는 landscape가 넘치지 않을 때만 쓰이므로,
+// portrait에서만 넘쳐도 PDF 파일은 만들어지지만 아래에서 실패로 종료한다 (배포 중단).
 const CANVAS_ORDER: Canvas[] = ["portrait", "landscape"];
 
 async function render(browser: Browser, siteUrl: string, target: PdfTarget, canvas: Canvas): Promise<number[]> {
@@ -56,7 +57,7 @@ async function main() {
     await server.close();
   }
   if (failures.length > 0) {
-    console.error(`캔버스 오버플로가 있어 PDF를 만들 수 없습니다:\n${formatFailures(failures)}`);
+    console.error(`캔버스 오버플로가 있습니다 (배포 중단):\n${formatFailures(failures)}`);
     process.exit(1);
   }
   console.log(`PDF ${targets.length}개 생성 완료`);
