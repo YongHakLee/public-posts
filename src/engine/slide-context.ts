@@ -33,6 +33,14 @@ export function useSlideSlot(): SlideSlot {
   return useContext(SlideSlotContext);
 }
 
+/**
+ * 이 슬라이드가 지금 보이는(현재) 슬라이드인지. 발표 모드는 모든 슬라이드를 마운트해 두므로
+ * 영상·오디오 같은 미디어는 이 값으로 재생/일시정지한다. 읽기·인쇄 모드는 항상 true.
+ */
+export function useSlideActive(): boolean {
+  return useSlideSlot().active;
+}
+
 /** Step id(useId) → 등장 순서 */
 export type StepOrders = Readonly<Record<string, number>>;
 
