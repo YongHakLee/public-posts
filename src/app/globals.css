@@ -90,3 +90,8 @@
 .print-page {
   break-after: page;
 }
+
+/* 마지막 슬라이드 뒤에는 쪽 나눔을 두지 않는다 (빈 페이지 방지). */
+.print-page:last-child {
+  break-after: auto;
+}
