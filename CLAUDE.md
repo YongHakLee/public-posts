@@ -45,6 +45,11 @@
 - `<Slide theme="ink">`로 슬라이드 한 장만 테마를 바꿀 수 있다.
 - `<Step>`은 문서 순서대로 등장. 함께 등장시키려면 같은 `order`를 준다.
 - 캔버스 밖으로 일부러 걸치는 장식 요소는 `data-bleed`를 붙여 오버플로 검사에서 뺀다.
+- 뷰포트 반응형 변형(`sm:`·`md:`·`lg:`·`xl:`·`2xl:`)과 뷰포트 단위(`vw`·`vh`·`dvh`·`svh`·`lvh`, `h-screen` 등)는 쓰지 않는다. 캔버스 차이는 `portrait:`로만 표현한다. 이들은 실제 창 크기에 반응하는데 오버플로 검사는 정확히 1080×1350 / 1920×1080에서만 돌기 때문에, 390px 폰에서 보이는 다른 레이아웃을 검사가 승인할 수 있다. `tests/unit/content-rules.test.ts`가 `content/decks`·`content/motion` 소스를 스캔해 어기면 실패시킨다.
+- 이미지는 `content/decks/<slug>/assets/`에 두고 정적 import 한다 (`import pic from "./assets/pic.png"` → `pic.src` 또는 `next/image`). `"/x.png"` 같은 문자열 경로는 basePath를 무시하므로 쓰지 않는다.
+- 옵션: `<Deck transition="fade|slide|none">`, `<Step effect="fade|rise|scale">`.
+- 발표 모드는 모든 슬라이드를 마운트해 둔다. 영상·오디오는 `useSlideActive()`(`@/engine`)가 true일 때만 재생하고 false면 멈춘다.
+- 미리보기(데스크톱 브라우저): `?mode=read`(읽기 모드), `?print`·`?print&canvas=portrait`(인쇄·오버플로 검사 화면).
 - 슬라이드 안 링크·버튼은 클릭해도 넘어가지 않는다. 다른 요소를 막으려면 `data-no-nav`.
 
 ### 모션 추가
