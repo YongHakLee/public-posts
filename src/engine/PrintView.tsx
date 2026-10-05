@@ -6,6 +6,9 @@ import { CANVAS_SIZE } from "./canvas";
 import { nextFrame, slideOverflows } from "./dom";
 import { SlideSlotContext } from "./slide-context";
 
+/** 화면 밖 lazy 이미지는 decode()가 끝나지 않을 수 있어 대기 시간을 제한한다. */
+const IMAGE_TIMEOUT_MS = 10_000;
+
 type PrintViewProps = {
   slides: ReactNode[];
   canvas: Canvas;
@@ -23,8 +26,20 @@ export function PrintView({ slides, canvas, reportSteps }: PrintViewProps) {
   useEffect(() => {
     let cancelled = false;
     void (async () => {
+      // 스타일·레이아웃이 웹폰트를 요청한 뒤에 fonts.ready를 기다린다.
+      await nextFrame();
       await document.fonts.ready;
-      await Promise.all(Array.from(document.images, (img) => img.decode().catch(() => undefined)));
+      const images = Array.from(document.images);
+      // 화면 밖 이미지도 로드되도록 lazy를 해제한다.
+      for (const img of images) img.loading = "eager";
+      await Promise.all(
+        images.map((img) =>
+          Promise.race([
+            img.decode().catch(() => undefined),
+            new Promise<void>((done) => setTimeout(done, IMAGE_TIMEOUT_MS)),
+          ]),
+        ),
+      );
       await nextFrame();
       await nextFrame();
       if (cancelled || !root.current) return;

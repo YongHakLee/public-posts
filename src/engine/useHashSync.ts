@@ -10,7 +10,13 @@ export function useHashSync(current: number, count: number, onExternalChange: (i
     if (window.location.hash !== next) window.history.replaceState(null, "", next);
   }, [current]);
 
-  const onHash = useEffectEvent(() => onExternalChange(parseHash(window.location.hash, count)));
+  const onHash = useEffectEvent(() => {
+    const index = parseHash(window.location.hash, count);
+    onExternalChange(index);
+    // 범위 밖·잘못된 값이 현재 슬라이드로 보정되면 current가 안 바뀌므로 주소창을 직접 정리한다.
+    const canonical = formatHash(index);
+    if (window.location.hash !== canonical) window.history.replaceState(null, "", canonical);
+  });
 
   useEffect(() => {
     const listener = () => onHash();
