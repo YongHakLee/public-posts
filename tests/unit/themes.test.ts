@@ -27,7 +27,9 @@ describe("themes", () => {
   it("이름 가드", () => {
     expect(isThemeName("paper")).toBe(true);
     expect(isThemeName("nope")).toBe(false);
-    expect(themeNames).toEqual(["paper", "ink", "signal"]);
+    expect(themeNames).toEqual([
+      "paper", "ink", "signal", "thesis", "journal", "lecture", "breeze", "mint", "slate", "boardroom", "neon", "pop", "terracotta",
+    ]);
   });
 
   describe.each(themeNames)("%s", (name) => {

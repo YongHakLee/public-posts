@@ -14,7 +14,7 @@
 | `content/decks/<slug>/index.tsx` | 덱 (`<Deck>`의 직접 자식 하나 = 슬라이드 하나) |
 | `content/motion/<slug>/index.tsx` | 독립 모션 (`<MotionStage>`) |
 | `src/engine/` | 슬라이드 엔진. `*.ts` 순수 로직(단위 테스트), `*.tsx` 컴포넌트(E2E) |
-| `src/themes/` | 테마 토큰(`paper`, `ink`, `signal`) → CSS 변수 |
+| `src/themes/` | 테마 13개(태그로 분류, `defineTheme`) → CSS 변수 |
 | `src/fonts/` | 셀프호스팅 폰트(Pretendard, Hahmlet 명조, Black Han Sans 디스플레이) + `fonts.json`(버전·출처·라이선스) + `registry.ts` |
 | `src/app/gallery/page.dev.tsx` | 테마 갤러리 (dev 전용, 빌드 제외) |
 | `scripts/` | `serve-out`(로컬 정적 서버), `export-pdf`, `doctor` |
@@ -58,8 +58,29 @@
 - Tailwind `scale-*`·`translate-*` 클래스는 CSS 개별 변형 속성을 써서 Motion의 transform과 겹친다. 애니메이션할 요소의 시작 변형은 인라인 `style`로 둔다.
 
 ### 테마 추가
-1. `src/themes/<name>.ts` (`baseTokens` + `color`) → `src/themes/index.ts`의 `themes`에 등록.
-2. `npm run test` — 대비 4.5:1 미만이면 실패한다. `npm run dev` 후 `/public-posts/gallery/`에서 확인.
+1. `src/themes/<name>.ts`에서 `defineTheme({ label, description, tags, color, tokens? })`로 정의하고 `src/themes/index.ts`의 `themes`에 등록한다.
+   - `tokens`에는 기본값(`src/themes/base.ts`)과 다른 부분만 적는다. 객체는 하위 키 단위로 병합되고 배열(gap, easing)은 통째로 바뀐다. 스타일 프리셋: `academicTokens`(논문 스케일), `vividTokens`(화려 스케일·모션) — `src/themes/presets.ts`.
+   - 글꼴은 `src/themes/fonts.ts`의 `FONT_STACKS.sans|serif|display`만 쓴다. 새 글꼴이 필요하면 `src/fonts/`에 파일·라이선스를 넣고 `fonts.json`, `src/fonts/registry.ts`, `src/fonts/index.ts`(`preload: false`), 위 매니페스트 표에 함께 추가한다.
+   - 태그는 `THEME_TAGS`(`src/themes/types.ts`) 중 1~3개. 모든 태그는 2개 이상의 테마가 써야 한다.
+2. `npm run test` — 대비 4.5:1, 타입 스케일 순서, 태그·글꼴 규칙을 검사한다. `npm run dev` 후 `/public-posts/gallery/`에서 확인한다.
+
+태그: 논문 · 학술 · 산뜻 · 차분 · 화려 · 색채 · 다크 · 미니멀 · 비즈니스 · 따뜻함
+
+| 테마 | 태그 | 설명 |
+|---|---|---|
+| `paper` | 학술 · 차분 · 미니멀 | 따뜻한 흰 배경에 검정 글자, 파랑 포인트 하나. 강의·문서형 기본값 |
+| `ink` | 다크 · 차분 · 미니멀 | 어두운 배경의 고대비. 프로젝터·어두운 장소용 |
+| `signal` | 화려 · 색채 | 강한 빨강 배경에 흰 글자. 표지·섹션 구분·모션용 |
+| `thesis` | 논문 · 학술 · 미니멀 | 순백 바탕에 검정 명조, 남색 포인트. 논문·학회 발표용 |
+| `journal` | 논문 · 학술 · 따뜻함 | 아이보리 바탕의 명조와 짙은 버건디. 학술지 지면 느낌 |
+| `lecture` | 학술 · 산뜻 | 흰 바탕에 청록 포인트. 강의·튜토리얼용 |
+| `breeze` | 산뜻 · 미니멀 | 아주 옅은 하늘색과 남색 글자, 넓은 여백 |
+| `mint` | 산뜻 · 색채 | 민트 바탕에 진녹 글자, 코랄 포인트 |
+| `slate` | 비즈니스 · 차분 | 회청색 표면과 진회색 글자. 보고서·제안서용 |
+| `boardroom` | 비즈니스 · 다크 | 짙은 남색 바탕에 금색 포인트. 임원 보고용 |
+| `neon` | 화려 · 다크 · 색채 | 검정에 가까운 바탕과 마젠타 포인트, 굵은 디스플레이 제목 |
+| `pop` | 화려 · 색채 | 쨍한 노랑 바탕에 검정 글자, 큰 둥근 모서리 |
+| `terracotta` | 따뜻함 · 차분 | 베이지 바탕에 테라코타 포인트, 명조 제목 |
 
 ### draft → 공개
 레지스트리 항목에서 `draft: true`를 지운다. 종류별(deck/motion) 공개 작업물은 최소 1개가 있어야 한다 — Next 정적 export가 빈 `generateStaticParams()`를 거부하기 때문 (`tests/unit/registry.test.ts`가 검사). draft는 목록·라우트·PDF에서만 빠질 뿐 비공개가 아니다 — 저장소가 public이고 레지스트리가 클라이언트 번들에 포함되므로 제목과 코드는 볼 수 있다.

@@ -3,6 +3,7 @@ import { themeNames, themes } from "@/themes";
 import { baseTokens } from "@/themes/base";
 import { defineTheme, type ThemeSpec } from "@/themes/define";
 import { FONT_STACKS, MONO_STACK } from "@/themes/fonts";
+import { academicTokens, vividTokens } from "@/themes/presets";
 import { THEME_TAGS, type Theme } from "@/themes/types";
 
 const stacks: string[] = Object.values(FONT_STACKS);
@@ -94,5 +95,37 @@ describe("기존 테마 유지", () => {
     expect(themes.signal.color).toEqual({
       bg: "#B8321C", surface: "#A02B17", fg: "#FFFFFF", muted: "#FFE3DC", accent: "#1A1A1A", accentFg: "#FFFFFF", border: "#D9563F",
     });
+  });
+});
+
+describe("태그 분포", () => {
+  it.each([...THEME_TAGS])("'%s' 태그는 2개 이상의 테마가 쓴다", (tag) => {
+    const users = themeNames.filter((name) => themes[name].tags.includes(tag));
+    expect(users.length).toBeGreaterThanOrEqual(2);
+  });
+});
+
+describe("스타일 프리셋", () => {
+  it.each(["thesis", "journal"] as const)("%s는 논문 스케일·명조", (name) => {
+    const theme = themes[name];
+    expect(theme.type).toEqual(academicTokens.type);
+    expect(theme.leading.normal).toBe(1.7);
+    expect(theme.space.pad).toEqual({ landscape: 144, portrait: 112 });
+    expect(theme.radius).toBe(0);
+    expect(theme.font.sans).toBe(FONT_STACKS.serif);
+    expect(theme.font.display).toBe(FONT_STACKS.serif);
+  });
+
+  it.each(["neon", "pop"] as const)("%s는 화려 스케일·모션·디스플레이 글꼴", (name) => {
+    const theme = themes[name];
+    expect(theme.type.landscape).toMatchObject(vividTokens.type!.landscape!);
+    expect(theme.type.portrait).toMatchObject(vividTokens.type!.portrait!);
+    expect(theme.motion.duration).toEqual({ fast: 0.14, base: 0.28, slow: 0.55 });
+    expect(theme.font.display).toBe(FONT_STACKS.display);
+  });
+
+  it("terracotta는 명조 제목", () => {
+    expect(themes.terracotta.font.display).toBe(FONT_STACKS.serif);
+    expect(themes.terracotta.font.sans).toBe(FONT_STACKS.sans);
   });
 });
