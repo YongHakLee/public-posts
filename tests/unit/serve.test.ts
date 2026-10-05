@@ -1,6 +1,6 @@
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, sep } from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { resolveRequestPath, startServer, type RunningServer } from "../../scripts/lib/serve";
 
@@ -25,7 +25,11 @@ describe("resolveRequestPath", () => {
   });
   it("상위 디렉터리로 나가지 못한다", () => {
     const resolved = resolveRequestPath(root, BASE, "/public-posts/../../etc/passwd");
-    expect(resolved === null || resolved.startsWith(root)).toBe(true);
+    expect(resolved === null || resolved.startsWith(root + sep)).toBe(true);
+  });
+  it("인코딩된 .. 도 루트 밖으로 못 나간다", () => {
+    const resolved = resolveRequestPath(root, BASE, "/public-posts/%2e%2e/%2e%2e/etc/passwd");
+    expect(resolved === null || resolved.startsWith(root + sep)).toBe(true);
   });
   it("깨진 퍼센트 인코딩은 null", () => {
     expect(resolveRequestPath(root, BASE, "/public-posts/%E0%A4%A")).toBeNull();

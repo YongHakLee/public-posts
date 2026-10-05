@@ -62,8 +62,9 @@ export function startServer({ root, basePath, port, host = "127.0.0.1" }: ServeO
           return;
         }
         if (info?.isFile()) {
+          const content = await readFile(file);
           res.writeHead(200, { "Content-Type": TYPES[extname(file)] ?? "application/octet-stream" });
-          res.end(await readFile(file));
+          res.end(content);
           return;
         }
       }
@@ -71,7 +72,7 @@ export function startServer({ root, basePath, port, host = "127.0.0.1" }: ServeO
       res.writeHead(404, { "Content-Type": "text/html; charset=utf-8" });
       res.end(body);
     } catch {
-      res.writeHead(500);
+      if (!res.headersSent) res.writeHead(500);
       res.end();
     }
   });
